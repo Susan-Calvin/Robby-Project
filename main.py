@@ -3,9 +3,15 @@ import random
 import json
 import tornado
 import os
+import telebot
 import logging
 from config import *
 from flask import Flask, request
+
+bot = telebot.TeleBot(BOT_TOKEN)
+server = Flask(__name__)
+logger = telebot.logger
+logger.setLevel(logging.DEBUG)
 
 # NLP
 from nltk import edit_distance
@@ -125,5 +131,8 @@ def main() -> None:
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
 main()
+if __name__ == "__main__":
+    bot.remove_webhook()
+    bot.set_webhook(url=APP_URL)
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
