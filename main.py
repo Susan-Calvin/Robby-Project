@@ -6,12 +6,7 @@ import os
 import telebot
 import logging
 from config import *
-from flask import Flask, request
 
-bot = telebot.TeleBot(BOT_TOKEN)
-server = Flask(__name__)
-logger = telebot.logger
-logger.setLevel(logging.DEBUG)
 
 # NLP
 from nltk import edit_distance
@@ -21,11 +16,18 @@ from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # Machine learning
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
+
+
+# Set constants
+RANDOM_STATE = 42
+TOKEN = '5196192972:AAGYH6OP7KXiaDd4bvZZXB5PTw3iAJY7DvQ'
+
+# Load bots vocabulary
+with open('BOT_CONFIG.json', 'r', encoding="utf8") as file:
+    BOT_CONFIG = json.load(file)
 
 # Function to clean the text from symbols
 def clean_text(text):
@@ -56,17 +58,12 @@ def bot(input_text):
         return random.choice(BOT_CONFIG["intents"][intent]["responses"])
 
 
-RANDOM_STATE = 42
-TOKEN = '5196192972:AAGYH6OP7KXiaDd4bvZZXB5PTw3iAJY7DvQ'
-
-with open('BOT_CONFIG.json', 'r', encoding="utf8") as file:
-    BOT_CONFIG = json.load(file)
-
 # Vectorize sentances
 vectorizer = TfidfVectorizer(ngram_range=(2, 4), analyzer='char')
 X = []  ## Input messages vectors: "examples"
 y = []  ## The accroding intents, features
 
+# Test for key errors in vocabulary
 for intent in BOT_CONFIG['intents'].keys():
     try:
         for example in BOT_CONFIG['intents'][intent]['examples']:
@@ -74,6 +71,7 @@ for intent in BOT_CONFIG['intents'].keys():
             y.append(intent)
     except KeyError:
         print(BOT_CONFIG["intents"][intent])
+        print(intent)
 
 
 # Preprocess and split the samples
@@ -131,9 +129,7 @@ def main() -> None:
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
 main()
 
-if __name__ == "__main__":
-    bot.remove_webhook()
-    bot.set_webhook(url=APP_URL)
-    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
