@@ -6,6 +6,7 @@ import os
 import telebot
 import logging
 from config import *
+import psycopg2
 
 
 # NLP
@@ -20,10 +21,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 
-
 # Set constants
 RANDOM_STATE = 42
 TOKEN = '5196192972:AAGYH6OP7KXiaDd4bvZZXB5PTw3iAJY7DvQ'
+
+# Establish database connection
+db_connection = psycopg2.connect(DATABASE_URI, sslmode="require")
+db_object = db_connection.cursor()
+
 
 # Load bots vocabulary
 with open('BOT_CONFIG.json', 'r', encoding="utf8") as file:
@@ -89,6 +94,10 @@ def get_intent(input_text):
 
 def bot(input_text):
     intent = get_intent(input_text)
+    user_id = intent.from_user.id
+    username = intent.from_user.username
+    db_object.execute("INSERT INTO phrase(id, username, message_text) VALUES (%s, %s, %s)", (user_id, username, input_text))
+    db_connection.commit()
     return random.choice(BOT_CONFIG["intents"][intent]["responses"])
 
 def start(update: Update, context: CallbackContext) -> None:
