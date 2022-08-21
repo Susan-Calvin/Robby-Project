@@ -94,7 +94,7 @@ def get_intent(input_text):
 
 def bot(input_text):
     intent = get_intent(input_text)
-    db_object.execute("INSERT INTO phrase(message_text) VALUES (%s)", (input_text))
+    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (0, 0, input_text))
     db_connection.commit()
     return random.choice(BOT_CONFIG["intents"][intent]["responses"])
 
