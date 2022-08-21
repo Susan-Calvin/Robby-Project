@@ -44,4 +44,5 @@ tzdata==2022.2
 tzlocal==4.2
 wcwidth==0.2.5
 gunicorn
-psycopg
+psycopg2
+
