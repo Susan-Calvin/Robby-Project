@@ -1,13 +1,11 @@
 # Basic libraries
 import random
 import json
-import tornado
 import os
 import telebot
 import logging
 from config import *
 import psycopg2
-
 
 # NLP
 from nltk import edit_distance
@@ -35,6 +33,7 @@ with open('BOT_CONFIG.json', 'r', encoding="utf8") as file:
     BOT_CONFIG = json.load(file)
 
 # Function to clean the text from symbols
+"""
 def clean_text(text):
     output_text = ''
     for char in text:
@@ -43,6 +42,7 @@ def clean_text(text):
     return output_text
 
 # Function for locating the intent
+
 def get_intent(input_text):
     for intent in BOT_CONFIG['intents'].keys():  # Iterate over keys in dictionary
         for example in BOT_CONFIG['intents'][intent]['examples']:
@@ -61,14 +61,14 @@ def bot(input_text):
         return 'Вы ничего не ввели, попробуйте снова'
     else:
         return random.choice(BOT_CONFIG["intents"][intent]["responses"])
-
+"""
 
 # Vectorize sentances
 vectorizer = TfidfVectorizer(ngram_range=(2, 4), analyzer='char')
 X = []  ## Input messages vectors: "examples"
 y = []  ## The accroding intents, features
 
-# Test for key errors in vocabulary
+# Split vocabulary data to input and output subsets
 for intent in BOT_CONFIG['intents'].keys():
     try:
         for example in BOT_CONFIG['intents'][intent]['examples']:
@@ -94,9 +94,9 @@ def get_intent(input_text):
 
 def bot(input_text):
     intent = get_intent(input_text)
-    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (0, 0, input_text))
-    db_connection.commit()
     return random.choice(BOT_CONFIG["intents"][intent]["responses"])
+    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id , username, input_text))
+    db_connection.commit()
 
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
@@ -105,6 +105,10 @@ def start(update: Update, context: CallbackContext) -> None:
         fr'Hi {user.mention_markdown_v2()}\!',
         reply_markup=ForceReply(selective=True),
     )
+    username = update.message.chat.username
+    id = update.message.from_user.id
+    #db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id , username, input_text))
+    #db_connection.commit()
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""

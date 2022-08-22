@@ -37,7 +37,6 @@ regex==2022.4.24
 six==1.16.0
 scikit-learn
 stack-data==0.2.0
-tornado==6.1
 tqdm==4.64.0
 traitlets==5.2.1.post0
 tzdata==2022.2
