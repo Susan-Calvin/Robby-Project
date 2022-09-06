@@ -1,14 +1,9 @@
 # Basic libraries
 import random
 import json
-import os
 import telebot
-import logging
 from config import *
 import psycopg2
-
-# NLP
-from nltk import edit_distance
 
 # Telegram package
 from telegram import Update, ForceReply
@@ -29,39 +24,8 @@ db_object = db_connection.cursor()
 
 
 # Load bots vocabulary
-with open('BOT_CONFIG.json', 'r', encoding="utf8") as file:
+with open('BOT_CONFIG_ENG.json', 'r', encoding="utf8") as file:
     BOT_CONFIG = json.load(file)
-
-# Function to clean the text from symbols
-"""
-def clean_text(text):
-    output_text = ''
-    for char in text:
-        if char in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя- ":
-            output_text = output_text + char
-    return output_text
-
-# Function for locating the intent
-
-def get_intent(input_text):
-    for intent in BOT_CONFIG['intents'].keys():  # Iterate over keys in dictionary
-        for example in BOT_CONFIG['intents'][intent]['examples']:
-            text_a = clean_text(input_text.lower())
-            text_b = clean_text(example.lower())
-            if edit_distance(text_a, text_b) / max(len(text_a), len(text_b)) < 0.34:
-                return intent
-    return 'Not found'
-
-# Bot function
-def bot(input_text):
-    intent = get_intent(input_text)
-    if intent == 'Not found':
-        return 'Мы вас не поняли :( Попробуйте снова'
-    elif input_text == '':
-        return 'Вы ничего не ввели, попробуйте снова'
-    else:
-        return random.choice(BOT_CONFIG["intents"][intent]["responses"])
-"""
 
 # Vectorize sentances
 vectorizer = TfidfVectorizer(ngram_range=(2, 4), analyzer='char')
