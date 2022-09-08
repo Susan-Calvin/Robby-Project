@@ -1,7 +1,6 @@
 # Basic libraries
 import random
 import json
-import telebot
 from config import *
 import psycopg2
 
@@ -16,7 +15,6 @@ from sklearn.svm import LinearSVC
 
 # Set constants
 RANDOM_STATE = 42
-TOKEN = '5196192972:AAGYH6OP7KXiaDd4bvZZXB5PTw3iAJY7DvQ'
 
 # Establish database connection
 db_connection = psycopg2.connect(DATABASE_URI, sslmode="require")
@@ -59,10 +57,9 @@ def get_intent(input_text):
 def bot(input_text):
     intent = get_intent(input_text)
     return random.choice(BOT_CONFIG["intents"][intent]["responses"])
-    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id , username, input_text))
-    db_connection.commit()
 
-def start(update: Update, context: CallbackContext) -> None:
+
+def start(input_text, update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
@@ -71,8 +68,8 @@ def start(update: Update, context: CallbackContext) -> None:
     )
     username = update.message.chat.username
     id = update.message.from_user.id
-    #db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id , username, input_text))
-    #db_connection.commit()
+    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id, username, input_text))
+    db_connection.commit()
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
@@ -85,7 +82,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bots' token.
-    updater = Updater(TOKEN)
+    updater = Updater(BOT_TOKEN)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
