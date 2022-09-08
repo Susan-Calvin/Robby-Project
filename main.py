@@ -59,7 +59,7 @@ def bot(input_text):
     return random.choice(BOT_CONFIG["intents"][intent]["responses"])
 
 
-def start(input_text, update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
@@ -68,7 +68,7 @@ def start(input_text, update: Update, context: CallbackContext) -> None:
     )
     username = update.message.chat.username
     id = update.message.from_user.id
-    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id, username, input_text))
+    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id, username, 0))
     db_connection.commit()
 
 def help_command(update: Update, context: CallbackContext) -> None:
