@@ -25,10 +25,10 @@ db_object = db_connection.cursor()
 with open('BOT_CONFIG_ENG.json', 'r', encoding="utf8") as file:
     BOT_CONFIG = json.load(file)
 
-# Vectorize sentances
+# Vectorize sentences
 vectorizer = TfidfVectorizer(ngram_range=(2, 4), analyzer='char')
-X = []  ## Input messages vectors: "examples"
-y = []  ## The accroding intents, features
+X = []  # Input messages vectors: "examples"
+y = []  # The according intents, features
 
 # Split vocabulary data to input and output subsets
 for intent in BOT_CONFIG['intents'].keys():
@@ -51,8 +51,10 @@ X_test_vectorized = vectorizer.transform(X_test)
 model = LinearSVC()
 model.fit(X_train_vectorized, y_train)
 
+
 def get_intent(input_text):
     return model.predict(vectorizer.transform([input_text]))[0]
+
 
 def bot(input_text):
     intent = get_intent(input_text)
@@ -68,16 +70,19 @@ def start(update: Update, context: CallbackContext) -> None:
     )
     username = update.message.chat.username
     id = update.message.from_user.id
-    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (id, username, 0))
+    db_object.execute("INSERT INTO phrase(id, user_name, message_text) VALUES (%s, %s, %s)", (0, 0, 0))
     db_connection.commit()
+
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
+
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     update.message.reply_text(bot(update.message.text))
+
 
 def main() -> None:
     """Start the bot."""
@@ -91,7 +96,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
-    # on non command i.e message - echo the message on Telegram
+    # on non command i.e: message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the Bot
@@ -103,5 +108,7 @@ def main() -> None:
     updater.idle()
 
 main()
+
+
 
 
